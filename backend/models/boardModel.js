@@ -17,3 +17,15 @@ const getAllBoards = async () => {
     throw err;
   }
 };
+
+// -----------
+
+const getBoardById = async (id) => {
+  try {
+    const result = await pool.query("SELECT * FROM boards WHERE id = $1", [id]);
+    return result.rows[0];
+  } catch (err) {
+    console.error("errore nel recupero della board:", err);
+    throw err;
+  }
+};
