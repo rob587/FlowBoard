@@ -29,3 +29,40 @@ const getBoardById = async (id) => {
     throw err;
   }
 };
+
+// ---------
+
+const createBoard = async (title, description) => {
+  try {
+    const result = await pool.query(
+      "INSERT INTO boards (title, description) VALUES ($1, $2) RETURNING *",
+      [title, description],
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error("errore nella creazione della board", err);
+    throw err;
+  }
+};
+
+//------------
+
+const deleteBoard = async (id) => {
+  try {
+    const result = await pool.query(
+      "DELETE FROM boards WHERE id = $1 RETURNING *",
+      [id],
+    );
+    return result.rows[0];
+  } catch (err) {
+    console.error("errore nella cancellazione della board", err);
+    throw err;
+  }
+};
+
+module.exports = {
+  getAllBoards,
+  getBoardById,
+  createBoard,
+  deleteBoard,
+};
