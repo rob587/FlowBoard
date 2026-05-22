@@ -1,6 +1,6 @@
 const {
   getAllBoards,
-  getBoardbyId,
+  getBoardById,
   createBoard,
   deleteBoard,
 } = require("../models/boardModel");
@@ -17,7 +17,7 @@ const getAllBoardsController = async (req, res) => {
 const getBoardByIdController = async (req, res) => {
   try {
     const { id } = req.params;
-    const board = await getBoardbyId(id);
+    const board = await getBoardById(id);
     if (!board) return res.status(404).json({ error: "Board non trovata" });
     res.json({ success: true, board });
   } catch (err) {
