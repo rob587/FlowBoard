@@ -19,6 +19,9 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 console.log(`tentativo di ingresso sulla porta: ${PORT} `);
 
+const boardRoutes = require("../backend/routes/boards");
+app.use("/api/boards", boardRoutes);
+
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server aperto in http://0.0.0.0:${PORT}`);
 });
