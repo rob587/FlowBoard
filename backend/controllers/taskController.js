@@ -28,3 +28,26 @@ const getTaskByIdController = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+const createTaskController = async (req, res) => {
+  try {
+    const { boardId } = req.params;
+    const { title, description } = req.body;
+    if (!title) return res.status(404).json({ error: "titolo obbligatorio!" });
+    const task = await createTask(boardId, title, description);
+    res.json({ success: true, task });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+};
+
+const updateTaskController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, status, position } = req.body;
+    const task = await updateTask(id, title, description, status, position);
+    if (!task) return res.status(404).json({ error: "task non trovata!" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
