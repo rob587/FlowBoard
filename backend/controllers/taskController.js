@@ -17,3 +17,14 @@ const getTasksByBoardIdController = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+const getTaskByIdController = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const task = await getTaskById(id);
+    if (!task) return res.status(404).json({ error: "task non trovata!" });
+    res.json({ success: true, task });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
