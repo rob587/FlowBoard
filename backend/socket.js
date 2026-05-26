@@ -14,5 +14,15 @@ const setupSocket = (server) => {
       socket.join(`board:${boardId}`);
       console.log(`Utente ${socket.id} si è unito alla board ${boardId}`);
     });
+    socket.on("leave:board", (boardId) => {
+      socket.leave(`board:${boardId}`);
+      console.log(`Utente ${socket.id} ha lasciato la board ${boardId}`);
+    });
+    socket.on("disconnect", () => {
+      console.log("Utente disconnesso:", socket.id);
+    });
   });
+  return io;
 };
+
+module.exports = setupSocket;
