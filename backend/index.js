@@ -2,10 +2,14 @@ const express = require("express");
 const cors = require("cors");
 const pool = require("../backend/db");
 require("dotenv").config();
+const http = require("http");
+const setupSocket = require("./socket");
 
 console.log("avvio server in corso..");
 
 const app = express();
+const server = http.createServer(app);
+const io = setupSocket(server);
 
 app.use(cors());
 app.use(express.json());
