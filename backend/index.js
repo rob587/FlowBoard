@@ -29,6 +29,8 @@ app.use("/api/boards", boardRoutes);
 const taskRoutes = require("./routes/tasks");
 app.use("/api/tasks", taskRoutes);
 
-app.listen(PORT, "0.0.0.0", () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`Server aperto in http://0.0.0.0:${PORT}`);
 });
+
+module.exports = io;
