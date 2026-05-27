@@ -43,4 +43,14 @@ export const SocketProvider = ({ children }) => {
       newSocket.disconnect();
     };
   }, []);
+
+  const loadBoards = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/boards");
+      const data = await response.json();
+      setBoards(data.boards);
+    } catch (err) {
+      console.error("errore nel caricare le boards", err);
+    }
+  };
 };
