@@ -70,4 +70,19 @@ export const SocketProvider = ({ children }) => {
       console.error("Errore nel caricare le task:", err);
     }
   };
+
+  const createBoard = async () => {
+    try {
+      const response = awaitfetch("http://localhost:5000/api/boards", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, description }),
+      });
+      const data = await response.json();
+      setBoards([...boards, data.board]);
+      return data.board;
+    } catch (err) {
+      console.error("Errore nella creazione della board:", err);
+    }
+  };
 };
