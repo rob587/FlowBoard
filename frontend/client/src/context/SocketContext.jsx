@@ -53,4 +53,21 @@ export const SocketProvider = ({ children }) => {
       console.error("errore nel caricare le boards", err);
     }
   };
+
+  const loadTasks = async (boardId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/tasks/board/${boardId}`,
+      );
+      const data = await response.json();
+      setTasks(data.tasks);
+      setCurrentBoardId(boardId);
+
+      if (socket) {
+        socket.emit("join:board:", boardId);
+      }
+    } catch (err) {
+      console.error("Errore nel caricare le task:", err);
+    }
+  };
 };
