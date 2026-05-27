@@ -24,5 +24,23 @@ export const SocketProvider = ({ children }) => {
       console.log("Task Creata!:", task);
       setTasks((prev) => [...prev, task]);
     });
+
+    newSocket.on("task:updated", (task) => {
+      console.log("Task Aggiornata:", task);
+      setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
+    });
+
+    newSocket.on("task:deleted", (data) => {
+      console.log("Task Cancellata:", data.id);
+      setTasks((prev) => prev.filter((t) => t.id !== data.id));
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Disconnesso dal Server");
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
   }, []);
 };
