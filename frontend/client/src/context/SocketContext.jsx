@@ -130,4 +130,23 @@ export const SocketProvider = ({ children }) => {
       console.error("Errore nella cancellazione della task", err);
     }
   };
+
+  return (
+    <SocketContext.Provider
+      value={{
+        socket,
+        tasks,
+        boards,
+        currentBoardId,
+        loadBoards,
+        loadTasks,
+        createBoard,
+        createTask,
+        updateTask,
+        deleteTask,
+      }}
+    >
+      {children}
+    </SocketContext.Provider>
+  );
 };
