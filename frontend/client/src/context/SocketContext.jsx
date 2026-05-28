@@ -102,4 +102,32 @@ export const SocketProvider = ({ children }) => {
       console.error("Errore nella creazione della task:", err);
     }
   };
+
+  const updateTask = async (taskId, title, description, status, position) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/tasks/${taskId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title, description, status, position }),
+        },
+      );
+      const data = await response.json();
+
+      return data.task;
+    } catch (err) {
+      console.error("Errore nell'aggiornamento della task:", err);
+    }
+  };
+
+  const deleteTask = async (taskId) => {
+    try {
+      await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
+        method: "DELETE",
+      });
+    } catch (err) {
+      console.error("Errore nella cancellazione della task", err);
+    }
+  };
 };
