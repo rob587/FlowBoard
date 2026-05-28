@@ -23,6 +23,11 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 console.log(`tentativo di ingresso sulla porta: ${PORT} `);
 
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 const boardRoutes = require("../backend/routes/boards");
 app.use("/api/boards", boardRoutes);
 

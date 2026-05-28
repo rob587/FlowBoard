@@ -31,8 +31,12 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("task:deleted", (data) => {
-      console.log("Task Cancellata:", data.id);
-      setTasks((prev) => prev.filter((t) => t.id !== data.id));
+      console.log("🗑️ Received task:deleted event:", data);
+      setTasks((prev) => {
+        const filtered = prev.filter((t) => t.id !== parseInt(data.id));
+        console.log("Tasks after filter:", filtered);
+        return filtered;
+      });
     });
 
     newSocket.on("disconnect", () => {
@@ -64,16 +68,16 @@ export const SocketProvider = ({ children }) => {
       setCurrentBoardId(boardId);
 
       if (socket) {
-        socket.emit("join:board:", boardId);
+        socket.emit("join:board", boardId);
       }
     } catch (err) {
       console.error("Errore nel caricare le task:", err);
     }
   };
 
-  const createBoard = async () => {
+  const createBoard = async (title, description) => {
     try {
-      const response = awaitfetch("http://localhost:5000/api/boards", {
+      const response = await fetch("http://localhost:5000/api/boards", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title, description }),
@@ -88,6 +92,11 @@ export const SocketProvider = ({ children }) => {
 
   const createTask = async (boardId, title, description) => {
     try {
+      // ✅ SEMPLICEMENTE EMIT join:board quando crei
+      if (socket) {
+        socket.emit("join:board", boardId);
+      }
+
       const response = await fetch(
         `http://localhost:5000/api/tasks/board/${boardId}`,
         {
@@ -96,10 +105,17 @@ export const SocketProvider = ({ children }) => {
           body: JSON.stringify({ title, description }),
         },
       );
+
+      if (!response.ok) {
+        // ← AGGIUNGI QUESTO
+        throw new Error("Failed to create task");
+      }
       const data = await response.json();
+      console.log("📝 Task response:", data);
+
       return data.task;
     } catch (err) {
-      console.error("Errore nella creazione della task:", err);
+      console.error("Error creating task:", err);
     }
   };
 
@@ -121,11 +137,22 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const deleteTask = async (taskId) => {
+  const deleteTask = async (taskId, boardId) => {
     try {
-      await fetch(`http://localhost:5000/api/tasks/${taskId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/tasks/${taskId}`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ boardId }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete task");
+      }
+
+      console.log("🗑️ Task deleted");
     } catch (err) {
       console.error("Errore nella cancellazione della task", err);
     }
