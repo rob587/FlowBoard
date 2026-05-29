@@ -40,8 +40,19 @@ const createBoardController = async (req, res) => {
 const deleteBoardController = async (req, res) => {
   try {
     const { id } = req.params;
-    const board = await deleteBoard(id);
+
+    await pool.query("DELETE FROM tasks WHERE board_id = $1", [id]);
+
+    const result = await pool.query(
+      "DELETE FROM boards WHERE id = $1 RETURNING *",
+      [id],
+    );
+    const board = result.rows[0];
+
     if (!board) return res.status(404).json({ error: "Board non trovata" });
+
+    req.io.emit("board:deleted", { id });
+
     res.json({ success: true, board });
   } catch (err) {
     res.status(500).json({ error: err.message });
