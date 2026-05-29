@@ -25,6 +25,15 @@ export const SocketProvider = ({ children }) => {
       setBoards((prev) => [...prev, board]);
     });
 
+    newSocket.on("board:deleted", (data) => {
+      console.log("🗑️ Board cancellata:", data.id);
+      setBoards((prev) => prev.filter((b) => b.id !== data.id));
+
+      if (currentBoardId === data.id) {
+        setCurrentBoardId(null);
+      }
+    });
+
     newSocket.on("task:created", (task) => {
       console.log("Task Creata!:", task);
       setTasks((prev) => [...prev, task]);
@@ -92,6 +101,25 @@ export const SocketProvider = ({ children }) => {
       return data.board;
     } catch (err) {
       console.error("Errore nella creazione della board:", err);
+    }
+  };
+
+  const deleteBoard = async (boardId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/api/boards/${boardId}`,
+        {
+          method: "DELETE",
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Fallito nel cancellare la board");
+      }
+
+      console.log("Board Cancellata");
+    } catch (err) {
+      console.error("Errore nel cancellare la Board", err);
     }
   };
 
@@ -173,6 +201,7 @@ export const SocketProvider = ({ children }) => {
         loadBoards,
         loadTasks,
         createBoard,
+        deleteBoard,
         createTask,
         updateTask,
         deleteTask,
