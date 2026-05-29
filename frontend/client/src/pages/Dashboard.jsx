@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/SocketContext";
+import Modal from "../components/Modal";
 
 const Dashboard = () => {
   const {
@@ -9,6 +10,7 @@ const Dashboard = () => {
     loadBoards,
     loadTasks,
     createBoard,
+    deleteBoard,
     createTask,
     deleteTask,
   } = useContext(SocketContext);
@@ -16,6 +18,9 @@ const Dashboard = () => {
   const [boardTitle, setBoardTitle] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDesc, setTaskDesc] = useState("");
+  const [boardModalOpen, setBoardModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [boardToDelete, setBoardToDelete] = useState(null);
 
   useEffect(() => {
     loadBoards();
@@ -46,13 +51,7 @@ const Dashboard = () => {
           </h1>
 
           <button
-            onClick={() => {
-              const title = prompt("Board title?");
-              if (title) {
-                setBoardTitle(title);
-                createBoard(title, "");
-              }
-            }}
+            onClick={() => setBoardModalOpen(true)}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg mb-6 transition"
           >
             + New Board
@@ -60,20 +59,32 @@ const Dashboard = () => {
 
           <div className="space-y-2">
             {boards.map((board) => (
-              <button
+              <div
                 key={board.id}
                 onClick={() => loadTasks(board.id)}
-                className={`w-full text-left px-4 py-3 rounded-lg transition ${
+                className={`w-full text-left px-4 py-3 rounded-lg transition flex justify-between items-start cursor-pointer ${
                   currentBoardId === board.id
                     ? "bg-blue-600 text-white"
                     : "bg-gray-700 hover:bg-gray-600 text-gray-200"
                 }`}
               >
-                <h3 className="font-semibold">{board.title}</h3>
-                <p className="text-sm text-gray-400">
-                  {tasks.filter((t) => t.board_id === board.id).length} tasks
-                </p>
-              </button>
+                <div className="flex-1">
+                  <h3 className="font-semibold">{board.title}</h3>
+                  <p className="text-sm text-gray-400">
+                    {tasks.filter((t) => t.board_id === board.id).length} tasks
+                  </p>
+                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setBoardToDelete(board.id);
+                    setDeleteModalOpen(true);
+                  }}
+                  className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-sm ml-2"
+                >
+                  ×
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -169,6 +180,45 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+        <Modal
+          isOpen={boardModalOpen}
+          title="Create New Board"
+          message="Enter board name:"
+          confirmText="Create"
+          cancelText="Cancel"
+          onConfirm={() => {
+            if (boardTitle.trim()) {
+              createBoard(boardTitle, "");
+              setBoardTitle("");
+              setBoardModalOpen(false);
+            }
+          }}
+          onCancel={() => {
+            setBoardModalOpen(false);
+            setBoardTitle("");
+          }}
+        />
+
+        {/* Modal per eliminare board */}
+        <Modal
+          isOpen={deleteModalOpen}
+          title="Delete Board"
+          message="Sei sicuro? Verranno eliminate anche tutte le task!"
+          confirmText="Delete"
+          cancelText="Cancel"
+          isDanger={true}
+          onConfirm={() => {
+            if (boardToDelete) {
+              deleteBoard(boardToDelete);
+              setDeleteModalOpen(false);
+              setBoardToDelete(null);
+            }
+          }}
+          onCancel={() => {
+            setDeleteModalOpen(false);
+            setBoardToDelete(null);
+          }}
+        />
       </div>
     </>
   );
