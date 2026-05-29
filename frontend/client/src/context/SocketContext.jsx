@@ -20,6 +20,11 @@ export const SocketProvider = ({ children }) => {
       console.log("Connesso al Server!");
     });
 
+    newSocket.on("board:created", (board) => {
+      console.log("🎉 Board created:", board);
+      setBoards((prev) => [...prev, board]);
+    });
+
     newSocket.on("task:created", (task) => {
       console.log("Task Creata!:", task);
       setTasks((prev) => [...prev, task]);

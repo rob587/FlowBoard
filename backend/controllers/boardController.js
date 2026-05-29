@@ -30,6 +30,7 @@ const createBoardController = async (req, res) => {
     const { title, description } = req.body;
     if (!title) return res.status(400).json({ error: "Titolo richiesto" });
     const board = await createBoard(title, description);
+    req.io.emit("board:created", board);
     res.json({ success: true, board });
   } catch (err) {
     res.status(500).json({ error: err.message });

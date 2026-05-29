@@ -70,7 +70,9 @@ const Dashboard = () => {
                 }`}
               >
                 <h3 className="font-semibold">{board.title}</h3>
-                <p className="text-sm text-gray-400">{tasks.length} tasks</p>
+                <p className="text-sm text-gray-400">
+                  {tasks.filter((t) => t.board_id === board.id).length} tasks
+                </p>
               </button>
             ))}
           </div>
