@@ -7,6 +7,10 @@ const Modal = ({
   confirmText = "Conferma",
   cancelText = "Cancella",
   isDanger = false,
+  hasInput = false,
+  inputValue = "",
+  onInputChange = () => {},
+  inputPlaceholder = "Inserisci Nome della Board",
 }) => {
   if (!isOpen) return null;
 
@@ -15,6 +19,16 @@ const Modal = ({
       <div className="bg-gray-800 p-8 rounded-lg border border-gray-700 max-w-md w-full">
         <h2 className="text-2xl font-bold mb-4 text-white">{title}</h2>
         <p className="text-gray-300 mb-6">{message}</p>
+        {hasInput && ( // ← AGGIUNGI QUESTO
+          <input
+            type="text"
+            placeholder={inputPlaceholder}
+            value={inputValue}
+            onChange={(e) => onInputChange(e.target.value)}
+            className="w-full p-3 bg-gray-700 text-white rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            autoFocus
+          />
+        )}
         <div className="flex gap-3">
           <button
             onClick={onCancel}

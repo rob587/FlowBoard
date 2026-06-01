@@ -26,17 +26,15 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("board:deleted", (data) => {
-      console.log("🗑️ Received board:deleted event:", data);
-      setBoards((prev) => {
-        const filtered = prev.filter((b) => b.id !== parseInt(data.id));
-        console.log("Boards after delete:", filtered);
+      console.log("Board Cancellata", data.id);
 
-        if (currentBoardId === parseInt(data.id)) {
-          setCurrentBoardId(filtered.length > 0 ? filtered[0].id : null);
-        }
+      const boardIdToDelete = parseInt(data.id);
 
-        return filtered;
-      });
+      setBoards((prev) => prev.filter((b) => b.id !== boardIdToDelete));
+
+      setTasks((prev) => prev.filter((t) => t.board_id !== boardIdToDelete));
+
+      setCurrentBoardId((prev) => (prev === boardIdToDelete ? null : prev));
     });
 
     newSocket.on("task:created", (task) => {

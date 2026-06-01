@@ -186,6 +186,10 @@ const Dashboard = () => {
           message="Enter board name:"
           confirmText="Create"
           cancelText="Cancel"
+          hasInput={true}
+          inputValue={boardTitle}
+          onInputChange={setBoardTitle}
+          inputPlaceholder="Board name..."
           onConfirm={() => {
             if (boardTitle.trim()) {
               createBoard(boardTitle, "");
