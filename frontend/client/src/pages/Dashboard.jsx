@@ -2,6 +2,10 @@ import { useContext, useEffect, useState } from "react";
 import { SocketContext } from "../context/SocketContext";
 import Modal from "../components/Modal";
 
+import TaskColumn from "../components/TaskColumn";
+import { DndContext, closestCorners } from "@dnd-kit/core";
+import { handleDragEnd } from "../utils/dragHandlers";
+
 const Dashboard = () => {
   const {
     boards,
@@ -13,6 +17,7 @@ const Dashboard = () => {
     deleteBoard,
     createTask,
     deleteTask,
+    updateTask,
   } = useContext(SocketContext);
 
   const [boardTitle, setBoardTitle] = useState("");
@@ -123,49 +128,30 @@ const Dashboard = () => {
               </div>
 
               {/* Tasks List */}
-              <div className="bg-gray-800 rounded-lg border border-gray-700 p-6">
-                <h3 className="text-2xl font-bold mb-4">
-                  Tasks ({tasks.length})
-                </h3>
-                <div className="space-y-3">
-                  {tasks.length === 0 ? (
-                    <p className="text-gray-400">No tasks yet. Create one!</p>
-                  ) : (
-                    tasks.map((task) => (
-                      <div
-                        key={task.id}
-                        className="bg-gray-700 p-4 rounded-lg flex justify-between items-center hover:bg-gray-600 transition"
-                      >
-                        <div>
-                          <h4 className="font-semibold">{task.title}</h4>
-                          {task.description && (
-                            <p className="text-sm text-gray-400">
-                              {task.description}
-                            </p>
-                          )}
-                          <span
-                            className={`inline-block mt-2 text-xs px-2 py-1 rounded ${
-                              task.status === "todo"
-                                ? "bg-yellow-600"
-                                : task.status === "doing"
-                                  ? "bg-blue-600"
-                                  : "bg-green-600"
-                            }`}
-                          >
-                            {task.status}
-                          </span>
-                        </div>
-                        <button
-                          onClick={() => deleteTask(task.id, currentBoardId)}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded transition"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    ))
-                  )}
+              <DndContext
+                collisionDetection={closestCorners}
+                onDragEnd={(event) =>
+                  handleDragEnd(event, tasks, currentBoardId, updateTask)
+                }
+              >
+                <div className="grid grid-cols-3 gap-4 flex-1">
+                  <TaskColumn
+                    status="todo"
+                    tasks={tasks.filter((t) => t.status === "todo")}
+                    boardId={currentBoardId}
+                  />
+                  <TaskColumn
+                    status="doing"
+                    tasks={tasks.filter((t) => t.status === "doing")}
+                    boardId={currentBoardId}
+                  />
+                  <TaskColumn
+                    status="done"
+                    tasks={tasks.filter((t) => t.status === "done")}
+                    boardId={currentBoardId}
+                  />
                 </div>
-              </div>
+              </DndContext>
             </>
           ) : (
             <div className="flex items-center justify-center h-full">
