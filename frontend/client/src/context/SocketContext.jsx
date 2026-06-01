@@ -26,12 +26,17 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("board:deleted", (data) => {
-      console.log("🗑️ Board cancellata:", data.id);
-      setBoards((prev) => prev.filter((b) => b.id !== data.id));
+      console.log("🗑️ Received board:deleted event:", data);
+      setBoards((prev) => {
+        const filtered = prev.filter((b) => b.id !== parseInt(data.id));
+        console.log("Boards after delete:", filtered);
 
-      if (currentBoardId === data.id) {
-        setCurrentBoardId(null);
-      }
+        if (currentBoardId === parseInt(data.id)) {
+          setCurrentBoardId(filtered.length > 0 ? filtered[0].id : null);
+        }
+
+        return filtered;
+      });
     });
 
     newSocket.on("task:created", (task) => {
@@ -113,6 +118,8 @@ export const SocketProvider = ({ children }) => {
         },
       );
 
+      const data = await response.json();
+
       if (!response.ok) {
         throw new Error("Fallito nel cancellare la board");
       }
@@ -125,7 +132,6 @@ export const SocketProvider = ({ children }) => {
 
   const createTask = async (boardId, title, description) => {
     try {
-      // ✅ SEMPLICEMENTE EMIT join:board quando crei
       if (socket) {
         socket.emit("join:board", boardId);
       }
@@ -140,7 +146,6 @@ export const SocketProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        // ← AGGIUNGI QUESTO
         throw new Error("Failed to create task");
       }
       const data = await response.json();

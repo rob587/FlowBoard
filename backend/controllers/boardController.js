@@ -4,6 +4,7 @@ const {
   createBoard,
   deleteBoard,
 } = require("../models/boardModel");
+const pool = require("../db");
 
 const getAllBoardsController = async (req, res) => {
   try {
