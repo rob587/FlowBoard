@@ -157,15 +157,29 @@ export const SocketProvider = ({ children }) => {
 
   const updateTask = async (taskId, title, description, status, position) => {
     try {
+      console.log("Aggiornando la task:", taskId, "allo stato:", status);
       const response = await fetch(
         `http://localhost:5000/api/tasks/${taskId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title, description, status, position }),
+          body: JSON.stringify({
+            title,
+            description,
+            status,
+            position,
+            boardId: currentBoardId,
+          }),
         },
       );
+
+      if (!response.ok) {
+        throw new Error("Errore nell'aggiornamento della task");
+      }
+
       const data = await response.json();
+
+      console.log("Task Aggiornata:", data);
 
       return data.task;
     } catch (err) {
