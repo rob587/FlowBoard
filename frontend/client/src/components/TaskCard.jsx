@@ -1,11 +1,13 @@
 import React from "react";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { SocketContext } from "../context/SocketContext";
+import Modal from "./Modal";
 
 const TaskCard = ({ task, boardId }) => {
   const { deleteTask, updateTask } = useContext(SocketContext);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const {
     attributes,
     listeners,
@@ -54,13 +56,30 @@ const TaskCard = ({ task, boardId }) => {
             {task.status}
           </span>
           <button
-            onClick={() => deleteTask(task.id, boardId)}
+            onClick={() => setDeleteModalOpen(true)}
             className="bg-red-600 hover:bg-red-700 text-white text-sm px-2 py-1 rounded transition"
           >
             Delete
           </button>
         </div>
       </div>
+
+      {/* modale di elimazione task */}
+      <Modal
+        isOpen={deleteModalOpen}
+        title="Eliminazione Task"
+        message="Sei sicuro di voler eliminare questa task?"
+        confirmText="Cancella"
+        cancelText="Indietro"
+        isDanger={true}
+        onConfirm={() => {
+          deleteTask(task.id, boardId);
+          setDeleteModalOpen(false);
+        }}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+        }}
+      />
     </>
   );
 };

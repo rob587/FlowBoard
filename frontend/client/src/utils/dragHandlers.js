@@ -17,10 +17,6 @@ export const handleDragEnd = async (event, tasks, boardId, updateTask) => {
 
   if (task.status === newColumnStatus) return;
 
-  console.log(
-    `La Task ${taskId} è stata impostata da ${task.status} a ${newColumnStatus}`,
-  );
-
   await updateTask(
     taskId,
     task.title,

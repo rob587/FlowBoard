@@ -21,13 +21,10 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("board:created", (board) => {
-      console.log("🎉 Board created:", board);
       setBoards((prev) => [...prev, board]);
     });
 
     newSocket.on("board:deleted", (data) => {
-      console.log("Board Cancellata", data.id);
-
       const boardIdToDelete = parseInt(data.id);
 
       setBoards((prev) => prev.filter((b) => b.id !== boardIdToDelete));
@@ -38,12 +35,10 @@ export const SocketProvider = ({ children }) => {
     });
 
     newSocket.on("task:created", (task) => {
-      console.log("Task Creata!:", task);
       setTasks((prev) => [...prev, task]);
     });
 
     newSocket.on("task:updated", (task) => {
-      console.log("Task Aggiornata:", task);
       setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
     });
 
@@ -51,17 +46,11 @@ export const SocketProvider = ({ children }) => {
 
     newSocket.on("task:deleted", (data) => {
       const socketTime = performance.now();
-      console.log(`⏱️ [SOCKET] Received at: ${socketTime}`);
-      console.log("🗑️ Task deleted event:", data);
 
-      // NON usare currentBoardId! Filtra direttamente per task.id
       setTasks((prev) => {
         const updateTime = performance.now();
         const filtered = prev.filter((t) => t.id !== parseInt(data.id));
-        console.log("Tasks after filter:", filtered.length);
-        console.log(
-          `⏱️ [UPDATE] Took: ${(updateTime - socketTime).toFixed(2)}ms`,
-        );
+
         return filtered;
       });
     });
@@ -118,9 +107,8 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const deleteBoard = async (boardId) => {
+  const deleteBoard = async (boardId, taskId) => {
     try {
-      console.log("🗑️ Deleting task:", taskId);
       const response = await fetch(
         `http://localhost:5000/api/boards/${boardId}`,
         {
@@ -128,16 +116,11 @@ export const SocketProvider = ({ children }) => {
         },
       );
 
-      console.log("Response status:", response.status);
-
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error("Fallito nel cancellare la board");
       }
-
-      console.log("Board Cancellata");
-      console.log("✅ Task deleted successfully");
     } catch (err) {
       console.error("Errore nel cancellare la Board", err);
     }
@@ -155,20 +138,18 @@ export const SocketProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to create task");
+        throw new Error("Errore nella creazione della task");
       }
       const data = await response.json();
-      console.log("📝 Task response:", data);
 
       return data.task;
     } catch (err) {
-      console.error("Error creating task:", err);
+      console.error("Errore:", err);
     }
   };
 
   const updateTask = async (taskId, title, description, status, position) => {
     try {
-      console.log("Aggiornando la task:", taskId, "allo stato:", status);
       const response = await fetch(
         `http://localhost:5000/api/tasks/${taskId}`,
         {
@@ -190,8 +171,6 @@ export const SocketProvider = ({ children }) => {
 
       const data = await response.json();
 
-      console.log("Task Aggiornata:", data);
-
       return data.task;
     } catch (err) {
       console.error("Errore nell'aggiornamento della task:", err);
@@ -200,9 +179,7 @@ export const SocketProvider = ({ children }) => {
 
   const deleteTask = async (taskId, boardId) => {
     try {
-      // ⚡ AGGIORNA SUBITO (optimistic update)
       setTasks((prev) => prev.filter((t) => t.id !== taskId));
-      console.log("✨ UI updated immediately");
 
       const response = await fetch(
         `http://localhost:5000/api/tasks/${taskId}`,
@@ -214,7 +191,6 @@ export const SocketProvider = ({ children }) => {
       );
 
       if (!response.ok) {
-        // Se fallisce, ricarica le task
         const tasksResponse = await fetch(
           `http://localhost:5000/api/tasks/board/${boardId}`,
         );
@@ -222,8 +198,6 @@ export const SocketProvider = ({ children }) => {
         setTasks(tasksData.tasks);
         throw new Error("Failed to delete task");
       }
-
-      console.log("✅ Task deleted successfully");
     } catch (err) {
       console.error("Errore nella cancellazione della task", err);
     }
