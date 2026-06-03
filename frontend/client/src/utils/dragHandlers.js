@@ -1,12 +1,17 @@
-export const handleDragEnd = async (event, TaskSignal, boardId, updateTask) => {
+export const handleDragEnd = async (event, tasks, boardId, updateTask) => {
   const { active, over } = event;
 
   if (!over) return;
 
   const taskId = active.id;
-  const newColumnStatus = over.id.replace("column-", "");
+  // conversione a stringa e estraggo lo status
+  const overIdString = String(over.id);
+  // se non è una colonna viene skippata
+  if (!overIdString.includes("column-")) return;
 
-  const task = TaskSignal.find((t) => t.id === taskId);
+  const newColumnStatus = overIdString.replace("column-", "");
+
+  const task = tasks.find((t) => t.id === taskId);
 
   if (!task) return;
 
