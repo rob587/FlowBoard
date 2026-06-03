@@ -23,6 +23,8 @@ const Dashboard = () => {
   const [boardTitle, setBoardTitle] = useState("");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskDesc, setTaskDesc] = useState("");
+  const [taskDueDate, setTaskDueDate] = useState("");
+  const [taskPriority, setTaskPriority] = useState("medium");
   const [boardModalOpen, setBoardModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
@@ -40,9 +42,17 @@ const Dashboard = () => {
 
   const handleCreateTask = async () => {
     if (taskTitle.trim() && currentBoardId) {
-      await createTask(currentBoardId, taskTitle, taskDesc);
+      await createTask(
+        currentBoardId,
+        taskTitle,
+        taskDesc,
+        taskDueDate,
+        taskPriority,
+      );
       setTaskTitle("");
       setTaskDesc("");
+      setTaskDueDate("");
+      setTaskPriority("medium");
     }
   };
 
@@ -119,6 +129,26 @@ const Dashboard = () => {
                   className="w-full p-3 bg-gray-700 text-white rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   rows="2"
                 />
+
+                {/* Due Date */}
+                <input
+                  type="date"
+                  value={taskDueDate}
+                  onChange={(e) => setTaskDueDate(e.target.value)}
+                  className="w-full p-3 bg-gray-700 text-white rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+
+                {/* Priority */}
+                <select
+                  value={taskPriority}
+                  onChange={(e) => setTaskPriority(e.target.value)}
+                  className="w-full p-3 bg-gray-700 text-white rounded-lg mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="low">🟢 Low</option>
+                  <option value="medium">🟡 Medium</option>
+                  <option value="high">🔴 High</option>
+                </select>
+
                 <button
                   onClick={handleCreateTask}
                   className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition"
@@ -166,6 +196,8 @@ const Dashboard = () => {
             </div>
           )}
         </div>
+
+        {/* Modal per creare board */}
         <Modal
           isOpen={boardModalOpen}
           title="Create New Board"

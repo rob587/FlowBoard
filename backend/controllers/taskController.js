@@ -32,10 +32,16 @@ const getTaskByIdController = async (req, res) => {
 const createTaskController = async (req, res) => {
   try {
     const { boardId } = req.params;
-    const { title, description } = req.body;
+    const { title, description, dueDate, priority } = req.body;
     if (!title) return res.status(400).json({ error: "Title required" });
 
-    const task = await createTask(boardId, title, description);
+    const task = await createTask(
+      boardId,
+      title,
+      description,
+      dueDate,
+      priority,
+    );
 
     req.io.to(`board:${boardId}`).emit("task:created", task);
 
@@ -48,8 +54,17 @@ const createTaskController = async (req, res) => {
 const updateTaskController = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, description, status, position, boardId } = req.body;
-    const task = await updateTask(id, title, description, status, position);
+    const { title, description, status, position, boardId, dueDate, priority } =
+      req.body;
+    const task = await updateTask(
+      id,
+      title,
+      description,
+      status,
+      position,
+      dueDate,
+      priority,
+    );
 
     req.io.to(`board:${boardId}`).emit("task:updated", task);
 

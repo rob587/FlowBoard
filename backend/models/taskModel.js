@@ -28,8 +28,8 @@ const getTaskById = async (id) => {
 const createTask = async (boardId, title, description) => {
   try {
     const result = await pool.query(
-      "INSERT INTO tasks (board_id, title, description) VALUES ($1, $2, $3) RETURNING *",
-      [boardId, title, description],
+      "INSERT INTO tasks (board_id, title, description, due_date, priority) VALUES ($1, $2, $3) RETURNING *",
+      [boardId, title, description, dueDate, priority],
     );
     return result.rows[0];
   } catch (err) {
@@ -41,8 +41,8 @@ const createTask = async (boardId, title, description) => {
 const updateTask = async (id, title, description, status, position) => {
   try {
     const result = await pool.query(
-      "UPDATE tasks SET title = $1, description = $2, status = $3, position = $4, updated_at = CURRENT_TIMESTAMP WHERE id = $5 RETURNING *",
-      [title, description, status, position, id],
+      "UPDATE tasks SET title = $1, description = $2, status = $3, position = $4, due_date = $5, priority = $6, updated_at = CURRENT_TIMESTAMP WHERE id = $7",
+      [title, description, status, position, dueDate, priority, id],
     );
     return result.rows[0];
   } catch (err) {
