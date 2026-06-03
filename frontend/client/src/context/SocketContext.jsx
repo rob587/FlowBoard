@@ -50,15 +50,12 @@ export const SocketProvider = ({ children }) => {
     let taskDeletedListenerCount = 0;
 
     newSocket.on("task:deleted", (data) => {
-      taskDeletedListenerCount++;
-      console.log(
-        `🗑️ LISTENER #${taskDeletedListenerCount} - Task deleted event:`,
-        data,
-      );
+      console.log("🗑️ Task deleted event:", data);
 
+      // NON usare currentBoardId! Filtra direttamente per task.id
       setTasks((prev) => {
         const filtered = prev.filter((t) => t.id !== parseInt(data.id));
-        console.log("Tasks after filter:", filtered);
+        console.log("Tasks after filter:", filtered.length);
         return filtered;
       });
     });
@@ -201,6 +198,13 @@ export const SocketProvider = ({ children }) => {
 
   const deleteTask = async (taskId, boardId) => {
     try {
+      // ← AGGIUNGI QUESTO!
+      if (socket) {
+        socket.emit("join:board", boardId);
+      }
+
+      console.log("🗑️ Deleting task:", taskId);
+
       const response = await fetch(
         `http://localhost:5000/api/tasks/${taskId}`,
         {
@@ -210,11 +214,13 @@ export const SocketProvider = ({ children }) => {
         },
       );
 
+      console.log("Response status:", response.status);
+
       if (!response.ok) {
         throw new Error("Failed to delete task");
       }
 
-      console.log("🗑️ Task deleted");
+      console.log("✅ Task deleted successfully");
     } catch (err) {
       console.error("Errore nella cancellazione della task", err);
     }

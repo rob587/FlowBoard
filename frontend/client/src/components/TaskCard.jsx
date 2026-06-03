@@ -47,7 +47,10 @@ const TaskCard = ({ task, boardId }) => {
             {task.status}
           </span>
           <button
-            onClick={() => deleteTask(task.id, boardId)}
+            onClick={(e) => {
+              e.stopPropagation();
+              deleteTask(task.id, boardId);
+            }}
             className="bg-red-600 hover:bg-red-700 text-white text-sm px-2 py-1 rounded transition"
           >
             Delete

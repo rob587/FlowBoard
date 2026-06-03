@@ -64,14 +64,15 @@ const deleteTaskController = async (req, res) => {
   try {
     const { id } = req.params;
     const { boardId } = req.body;
-    console.log("🗑️ Deleting task:", id, "from board:", boardId);
+
     const task = await deleteTask(id);
     if (!task) return res.status(404).json({ error: "Task not found" });
-    console.log("📡 Emitting task:deleted to room:", `board:${boardId}`);
+
     req.io.to(`board:${boardId}`).emit("task:deleted", { id });
 
     res.json({ success: true, task });
   } catch (err) {
+    console.error("❌ Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
