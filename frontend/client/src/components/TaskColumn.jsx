@@ -1,10 +1,10 @@
 import React from "react";
 import { useContext } from "react";
 import {
-  useDroppable,
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
 import TaskCard from "./TaskCard";
 
 const TaskColumn = ({ status, tasks, boardId }) => {
