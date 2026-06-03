@@ -25,10 +25,10 @@ const getTaskById = async (id) => {
   }
 };
 
-const createTask = async (boardId, title, description) => {
+const createTask = async (boardId, title, description, dueDate, priority) => {
   try {
     const result = await pool.query(
-      "INSERT INTO tasks (board_id, title, description, due_date, priority) VALUES ($1, $2, $3) RETURNING *",
+      "INSERT INTO tasks (board_id, title, description, due_date, priority) VALUES ($1, $2, $3, $4, $5) RETURNING *",
       [boardId, title, description, dueDate, priority],
     );
     return result.rows[0];
@@ -38,15 +38,24 @@ const createTask = async (boardId, title, description) => {
   }
 };
 
-const updateTask = async (id, title, description, status, position) => {
+const updateTask = async (
+  id,
+  title,
+  description,
+  status,
+  position,
+  dueDate = null,
+  priority = "medium",
+) => {
   try {
     const result = await pool.query(
-      "UPDATE tasks SET title = $1, description = $2, status = $3, position = $4, due_date = $5, priority = $6, updated_at = CURRENT_TIMESTAMP WHERE id = $7",
+      "UPDATE tasks SET title = $1, description = $2, status = $3, position = $4, due_date = $5, priority = $6, updated_at = CURRENT_TIMESTAMP WHERE id = $7 RETURNING *",
       [title, description, status, position, dueDate, priority, id],
     );
+
     return result.rows[0];
   } catch (err) {
-    console.error("errore nell'aggiornamento della task:", err);
+    console.error("❌ errore nell'aggiornamento della task:", err);
     throw err;
   }
 };

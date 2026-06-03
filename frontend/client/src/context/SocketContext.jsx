@@ -126,14 +126,14 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const createTask = async (boardId, title, description) => {
+  const createTask = async (boardId, title, description, dueDate, priority) => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/tasks/board/${boardId}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title, description }),
+          body: JSON.stringify({ title, description, dueDate, priority }),
         },
       );
 
@@ -148,7 +148,15 @@ export const SocketProvider = ({ children }) => {
     }
   };
 
-  const updateTask = async (taskId, title, description, status, position) => {
+  const updateTask = async (
+    taskId,
+    title,
+    description,
+    status,
+    position,
+    dueDate,
+    priority,
+  ) => {
     try {
       const response = await fetch(
         `http://localhost:5000/api/tasks/${taskId}`,
@@ -161,13 +169,11 @@ export const SocketProvider = ({ children }) => {
             status,
             position,
             boardId: currentBoardId,
+            dueDate,
+            priority,
           }),
         },
       );
-
-      if (!response.ok) {
-        throw new Error("Errore nell'aggiornamento della task");
-      }
 
       const data = await response.json();
 

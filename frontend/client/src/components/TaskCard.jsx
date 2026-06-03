@@ -23,6 +23,49 @@ const TaskCard = ({ task, boardId }) => {
     opacity: isDragging ? 0.5 : 1,
   };
 
+  // Funzione per formattare la data
+  const formatDate = (dateStr) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("it-IT", {
+      day: "numeric",
+      month: "short",
+    });
+  };
+
+  const isOverdue = (dateStr) => {
+    if (!dateStr) return false;
+    const today = new Date();
+    const dueDate = new Date(dateStr);
+    return dueDate < today;
+  };
+
+  const getPriorityColor = (priority) => {
+    switch (priority) {
+      case "low":
+        return "bg-green-600";
+      case "medium":
+        return "bg-yellow-600";
+      case "high":
+        return "bg-red-600";
+      default:
+        return "bg-gray-600";
+    }
+  };
+
+  const getPriorityEmoji = (priority) => {
+    switch (priority) {
+      case "low":
+        return "🟢";
+      case "medium":
+        return "🟡";
+      case "high":
+        return "🔴";
+      default:
+        return "⚪";
+    }
+  };
+
   return (
     <>
       <div
@@ -30,7 +73,7 @@ const TaskCard = ({ task, boardId }) => {
         style={style}
         className="bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition"
       >
-        {/* SOLO questa parte è draggable */}
+        {/* Draggable Section */}
         <div
           {...attributes}
           {...listeners}
@@ -42,7 +85,30 @@ const TaskCard = ({ task, boardId }) => {
           )}
         </div>
 
-        {/* Bottom section - NO listeners qui! */}
+        {/* Priority + Due Date Row */}
+        <div className="flex gap-2 mt-3 flex-wrap">
+          {/* Priority Badge */}
+          <span
+            className={`text-xs px-2 py-1 rounded ${getPriorityColor(
+              task.priority,
+            )}`}
+          >
+            {getPriorityEmoji(task.priority)} {task.priority}
+          </span>
+
+          {/* Due Date Badge */}
+          {task.due_date && (
+            <span
+              className={`text-xs px-2 py-1 rounded ${
+                isOverdue(task.due_date) ? "bg-red-600" : "bg-blue-600"
+              }`}
+            >
+              📅 {formatDate(task.due_date)}
+            </span>
+          )}
+        </div>
+
+        {/* Status + Delete Button */}
         <div className="flex justify-between items-center mt-3">
           <span
             className={`text-xs px-2 py-1 rounded ${
@@ -64,7 +130,7 @@ const TaskCard = ({ task, boardId }) => {
         </div>
       </div>
 
-      {/* modale di elimazione task */}
+      {/* Delete Modal */}
       <Modal
         isOpen={deleteModalOpen}
         title="Eliminazione Task"

@@ -23,5 +23,7 @@ export const handleDragEnd = async (event, tasks, boardId, updateTask) => {
     task.description,
     newColumnStatus,
     task.position,
+    task.due_date,
+    task.priority,
   );
 };

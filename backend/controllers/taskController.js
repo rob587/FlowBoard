@@ -56,6 +56,7 @@ const updateTaskController = async (req, res) => {
     const { id } = req.params;
     const { title, description, status, position, boardId, dueDate, priority } =
       req.body;
+
     const task = await updateTask(
       id,
       title,
@@ -71,6 +72,7 @@ const updateTaskController = async (req, res) => {
     if (!task) return res.status(404).json({ error: "task non trovata!" });
     res.json({ success: true, task });
   } catch (err) {
+    console.error("❌ Error:", err);
     res.status(500).json({ error: err.message });
   }
 };
