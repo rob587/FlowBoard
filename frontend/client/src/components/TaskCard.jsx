@@ -26,14 +26,21 @@ const TaskCard = ({ task, boardId }) => {
       <div
         ref={setNodeRef}
         style={style}
-        {...attributes}
-        {...listeners}
-        className="bg-gray-700 p-4 rounded-lg cursor-grab active:cursor-grabbing hover:bg-gray-600 transition"
+        className="bg-gray-700 p-4 rounded-lg hover:bg-gray-600 transition"
       >
-        <h4 className="font-semibold text-white">{task.title}</h4>
-        {task.description && (
-          <p className="text-sm text-gray-400 mt-1">{task.description}</p>
-        )}
+        {/* SOLO questa parte è draggable */}
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab active:cursor-grabbing"
+        >
+          <h4 className="font-semibold text-white">{task.title}</h4>
+          {task.description && (
+            <p className="text-sm text-gray-400 mt-1">{task.description}</p>
+          )}
+        </div>
+
+        {/* Bottom section - NO listeners qui! */}
         <div className="flex justify-between items-center mt-3">
           <span
             className={`text-xs px-2 py-1 rounded ${
@@ -47,10 +54,7 @@ const TaskCard = ({ task, boardId }) => {
             {task.status}
           </span>
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              deleteTask(task.id, boardId);
-            }}
+            onClick={() => deleteTask(task.id, boardId)}
             className="bg-red-600 hover:bg-red-700 text-white text-sm px-2 py-1 rounded transition"
           >
             Delete

@@ -50,12 +50,18 @@ export const SocketProvider = ({ children }) => {
     let taskDeletedListenerCount = 0;
 
     newSocket.on("task:deleted", (data) => {
+      const socketTime = performance.now();
+      console.log(`⏱️ [SOCKET] Received at: ${socketTime}`);
       console.log("🗑️ Task deleted event:", data);
 
       // NON usare currentBoardId! Filtra direttamente per task.id
       setTasks((prev) => {
+        const updateTime = performance.now();
         const filtered = prev.filter((t) => t.id !== parseInt(data.id));
         console.log("Tasks after filter:", filtered.length);
+        console.log(
+          `⏱️ [UPDATE] Took: ${(updateTime - socketTime).toFixed(2)}ms`,
+        );
         return filtered;
       });
     });
@@ -139,10 +145,6 @@ export const SocketProvider = ({ children }) => {
 
   const createTask = async (boardId, title, description) => {
     try {
-      if (socket) {
-        socket.emit("join:board", boardId);
-      }
-
       const response = await fetch(
         `http://localhost:5000/api/tasks/board/${boardId}`,
         {
@@ -198,12 +200,9 @@ export const SocketProvider = ({ children }) => {
 
   const deleteTask = async (taskId, boardId) => {
     try {
-      // ← AGGIUNGI QUESTO!
-      if (socket) {
-        socket.emit("join:board", boardId);
-      }
-
-      console.log("🗑️ Deleting task:", taskId);
+      // ⚡ AGGIORNA SUBITO (optimistic update)
+      setTasks((prev) => prev.filter((t) => t.id !== taskId));
+      console.log("✨ UI updated immediately");
 
       const response = await fetch(
         `http://localhost:5000/api/tasks/${taskId}`,
@@ -214,9 +213,13 @@ export const SocketProvider = ({ children }) => {
         },
       );
 
-      console.log("Response status:", response.status);
-
       if (!response.ok) {
+        // Se fallisce, ricarica le task
+        const tasksResponse = await fetch(
+          `http://localhost:5000/api/tasks/board/${boardId}`,
+        );
+        const tasksData = await tasksResponse.json();
+        setTasks(tasksData.tasks);
         throw new Error("Failed to delete task");
       }
 
