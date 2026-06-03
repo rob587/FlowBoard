@@ -47,8 +47,15 @@ export const SocketProvider = ({ children }) => {
       setTasks((prev) => prev.map((t) => (t.id === task.id ? task : t)));
     });
 
+    let taskDeletedListenerCount = 0;
+
     newSocket.on("task:deleted", (data) => {
-      console.log("🗑️ Received task:deleted event:", data);
+      taskDeletedListenerCount++;
+      console.log(
+        `🗑️ LISTENER #${taskDeletedListenerCount} - Task deleted event:`,
+        data,
+      );
+
       setTasks((prev) => {
         const filtered = prev.filter((t) => t.id !== parseInt(data.id));
         console.log("Tasks after filter:", filtered);
@@ -61,6 +68,7 @@ export const SocketProvider = ({ children }) => {
     });
 
     return () => {
+      newSocket.removeAllListeners();
       newSocket.disconnect();
     };
   }, []);
@@ -109,12 +117,15 @@ export const SocketProvider = ({ children }) => {
 
   const deleteBoard = async (boardId) => {
     try {
+      console.log("🗑️ Deleting task:", taskId);
       const response = await fetch(
         `http://localhost:5000/api/boards/${boardId}`,
         {
           method: "DELETE",
         },
       );
+
+      console.log("Response status:", response.status);
 
       const data = await response.json();
 
@@ -123,6 +134,7 @@ export const SocketProvider = ({ children }) => {
       }
 
       console.log("Board Cancellata");
+      console.log("✅ Task deleted successfully");
     } catch (err) {
       console.error("Errore nel cancellare la Board", err);
     }
