@@ -28,6 +28,7 @@ const Dashboard = () => {
   const [boardModalOpen, setBoardModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [boardToDelete, setBoardToDelete] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     loadBoards();
@@ -59,8 +60,20 @@ const Dashboard = () => {
   return (
     <>
       <div className="flex h-screen bg-gray-900 text-white">
-        {/* Sidebar */}
-        <div className="w-64 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto">
+        {/* Hamburger Button - Mobile only */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="lg:hidden fixed top-4 left-4 z-50 bg-blue-600 hover:bg-blue-700 p-2 rounded text-white font-bold"
+        >
+          ☰
+        </button>
+
+        {/* Sidebar - Hidden on mobile, visible on lg */}
+        <div
+          className={`fixed lg:static w-64 bg-gray-800 border-r border-gray-700 p-6 overflow-y-auto h-screen transform transition-transform lg:translate-x-0 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } z-40`}
+        >
           <h1 className="text-3xl font-bold mb-8 text-blue-400">
             📋 FlowBoard
           </h1>
@@ -76,7 +89,10 @@ const Dashboard = () => {
             {boards.map((board) => (
               <div
                 key={board.id}
-                onClick={() => loadTasks(board.id)}
+                onClick={() => {
+                  loadTasks(board.id);
+                  setSidebarOpen(false); // ← CHIUDI sidebar
+                }}
                 className={`w-full text-left px-4 py-3 rounded-lg transition flex justify-between items-start cursor-pointer ${
                   currentBoardId === board.id
                     ? "bg-blue-600 text-white"
@@ -108,7 +124,7 @@ const Dashboard = () => {
         <div className="flex-1 flex flex-col p-4 md:p-6 lg:p-8 overflow-hidden">
           {currentBoardId ? (
             <>
-              <h2 className="text-4xl font-bold mb-8">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 md:mb-6 lg:mb-8">
                 {boards.find((b) => b.id === currentBoardId)?.title}
               </h2>
 
@@ -159,8 +175,7 @@ const Dashboard = () => {
                 </button>
               </div>
 
-              {/* Tasks List */}
-              {/* Tasks List */}
+              {/* Kanban Board */}
               <DndContext
                 collisionDetection={closestCorners}
                 onDragEnd={(event) =>
@@ -168,8 +183,6 @@ const Dashboard = () => {
                 }
               >
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 flex-1 overflow-y-auto">
-                  {" "}
-                  {/* ← RESPONSIVE! */}
                   <TaskColumn
                     status="todo"
                     tasks={tasks.filter((t) => t.status === "todo")}
@@ -202,7 +215,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Modal per creare board */}
+        {/* Modals rimangono uguali */}
         <Modal
           isOpen={boardModalOpen}
           title="Create New Board"
@@ -226,7 +239,6 @@ const Dashboard = () => {
           }}
         />
 
-        {/* Modal per eliminare board */}
         <Modal
           isOpen={deleteModalOpen}
           title="Delete Board"
